@@ -1,61 +1,59 @@
 # Estado verificable
 
-Fecha de corte: **2026-09-07** · versión canónica: **0.1.0**
+Fecha de corte: **2026-09-07** · versión canónica: **0.2.0**
 
-Este archivo separa implementación, demostración documental y trabajo futuro. Una marca `DOCUMENTADO` significa que existe una explicación utilizable, no que exista una conexión certificada con una red de pagos.
+## Matriz de madurez
 
-| Superficie | Estado | Evidencia |
+| Componente | Estado | Fuente de verdad |
 | --- | --- | --- |
-| CLI `build`, `stats`, `validate` | `OPERATIVO` | `src/ai_dataset_foundry/cli.py` |
-| Ingesta texto/Markdown, JSON/JSONL, CSV | `OPERATIVO` | conectores + pruebas |
-| PDF, DOCX, HTML, URL y Git | `OPERATIVO-CON-EXTRAS` | extras `documents` y `web`; Git externo |
-| Normalización, limpieza, chunking y deduplicación | `OPERATIVO` | procesadores + pruebas |
-| JSONL, TXT, SQLite | `OPERATIVO` | exportadores + prueba end-to-end |
-| Parquet | `OPERATIVO-CON-EXTRA` | extra `parquet` |
-| Detección de secretos/PII | `BÁSICO` | heurísticas; no es DLP ni control PCI |
-| Atlas de medios de pago | `DOCUMENTADO` | `docs/PAYMENT_METHODS.md` |
-| Arquitectura de pago y operación | `DOCUMENTADO` | ciclo, integración, seguridad, riesgo y operaciones |
-| Corpus sintético de pagos | `OPERATIVO` | `examples/payments-corpus/` + `examples/payments.yaml` |
-| PSP/acquirer/emisor real | `NO-IMPLEMENTADO` | fuera de alcance de esta versión |
-| Procesamiento de dinero o PAN | `PROHIBIDO` | límites del README y `SECURITY.md` |
-| Docker Compose de infraestructura | `PLANIFICADO` | no es necesario para ejecutar la versión actual |
+| CLI `build`, `stats`, `validate`, `serve`, `desktop` | `OPERATIVO` | `src/ai_dataset_foundry/cli.py` |
+| Texto/Markdown/código, JSON/JSONL y CSV | `OPERATIVO` | conectores + pruebas |
+| PDF, DOCX, HTML y Web | `OPERATIVO-CON-EXTRAS` | extras `documents`/`web` |
+| Git local y remoto | `OPERATIVO` | `connectors/git.py`; Git requerido |
+| Normalize/clean/chunk/dedup/quality | `OPERATIVO` | procesadores + pruebas |
+| JSONL, TXT, SQLite | `OPERATIVO` | smoke end-to-end |
+| Parquet | `OPERATIVO-CON-EXTRA` | PyArrow |
+| UI localhost | `OPERATIVO` | API FastAPI + frontend vanilla |
+| Ejecutable Windows | `RELEASE` | job `windows-desktop` de release |
+| APK Android | `RELEASE-MÍNIMA` | lector offline texto/MD/JSON/CSV |
+| OCR, audio, vídeo, bases de datos y object storage | `PLANIFICADO` | roadmap; no implementado |
+| Actualización incremental | `DISEÑADO` | hashes presentes; registry pendiente |
 
 ## Hechos medidos
 
-| Hecho | Valor actual | Fuente de verdad |
+| Hecho | Valor actual | Fuente |
 | --- | ---: | --- |
-| Versión | 0.1.0 | `pyproject.toml` |
-| Python mínimo | 3.11 | `requires-python` y matriz CI |
-| Workflows | 3 | `.github/workflows/{ci,pages,release}.yml` |
-| Actions con pin inmutable | 6/6 acciones externas | SHA completo + comentario de versión en workflows |
-| Versiones Python en CI | 3 | 3.11, 3.12, 3.13 en `ci.yml` |
-| Archivos de prueba | 5 | `tests/test_*.py` |
-| Casos de prueba | 7 | colección de pytest |
-| Familias de pago documentadas | 9 | tabla maestra en `docs/PAYMENT_METHODS.md` |
+| Versión | 0.2.0 | `pyproject.toml` y `__version__` |
+| Python mínimo | 3.11 | manifest y CI |
+| Workflows | 4 | CI, Security, Pages, Release |
+| Versiones Python en CI | 3 | 3.11, 3.12, 3.13 |
+| Modalidades implementadas | 9 | TXT/MD/código, PDF, DOCX, HTML, Web, Git, JSON/JSONL, CSV |
+| Formatos de salida | 4 + manifest | JSONL, TXT, Parquet, SQLite |
+| Aplicaciones de release | 2 | Windows `.exe`, Android `.apk` |
 
-## Cómo reproducir la verificación
+Los conteos de pruebas se obtienen con `pytest --collect-only`; no se fijan aquí para evitar drift manual.
+
+## Reproducir
 
 ```bash
-python -m pip install -e ".[all,dev]"
-python scripts/doctor.py
-python scripts/smoke.py
-python scripts/verify_docs.py
-python -m pytest --basetemp .tmp/pytest --collect-only -q
-python -m pytest --basetemp .tmp/pytest -q
-python -m ruff check src tests scripts
+uv sync --extra all --extra dev --locked
+uv run python scripts/doctor.py
+uv run pytest -q
+uv run ruff check src tests scripts
+uv run python scripts/smoke.py
+uv run python scripts/verify_docs.py
+uv build
 ```
 
-El smoke test crea su salida en un directorio temporal, comprueba JSONL, manifiesto y SQLite y la elimina al terminar.
+## Lo que la versión 0.2.0 no afirma
 
-## Limitaciones conocidas
+- No entrena ni sirve modelos.
+- No realiza OCR de escaneados.
+- No rastrea sitios completos ni ignora `robots.txt`.
+- No garantiza derechos, verdad, ausencia de sesgo o anonimización.
+- No ofrece procesamiento distribuido ni registro incremental persistente.
+- El APK no replica los parsers pesados de Windows; es una edición mínima offline.
 
-- Las dependencias tienen rangos compatibles, no lockfile reproducible por plataforma.
-- La ingesta web realiza una descarga de página individual y no implementa crawler, robots scheduler ni rate limiter distribuido.
-- El score de calidad es heurístico; no mide veracidad, licencia, sesgo ni adecuación pedagógica.
-- La deduplicación near-match usa SimHash y puede unir falsos positivos o conservar falsos negativos.
-- La documentación de pagos es transversal y Chile-first en regulación, pero cada implementación debe revalidarse para su país, proveedor y contrato.
-- No existen credenciales, llamadas a sandbox de PSP ni datos de titulares dentro del repositorio.
+## Criterio para cambiar un estado
 
-## Criterio de salida para una integración real futura
-
-Una integración solo puede pasar de `PLANIFICADO` a `OPERATIVO-SANDBOX` si incluye contrato versionado, fixtures sintéticos, verificación de firmas, idempotencia, pruebas de replay y desorden, conciliación, runbook, SLO y evidencia CI. `OPERATIVO-PRODUCCIÓN` exigiría además certificación/proceso del proveedor y evidencia externa que no puede declararse desde este repositorio.
+Una capacidad pasa a `OPERATIVO` solo cuando existe implementación, prueba automatizada o smoke reproducible, documentación de límites y ejecución verde en CI. Un diseño, mockup o dependencia nombrada no cuenta como implementación.

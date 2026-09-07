@@ -1,42 +1,35 @@
-"""Run the payment corpus through the real pipeline in a temporary directory."""
+"""Small end-to-end build against committed synthetic content."""
 
 from __future__ import annotations
 
 import json
-import sys
-import tempfile
+import shutil
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "src"))
+from ai_dataset_foundry.config import BuildConfig
+from ai_dataset_foundry.pipeline import build_dataset
 
-from ai_dataset_foundry.config import BuildConfig  # noqa: E402
-from ai_dataset_foundry.pipeline import build_dataset  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+OUTPUT = ROOT / "work" / "smoke"
 
 
 def main() -> int:
-    with tempfile.TemporaryDirectory(prefix="foundry-smoke-", ignore_cleanup_errors=True) as temporary:
-        out = Path(temporary) / "payments"
-        config = BuildConfig(
-            inputs=[str(ROOT / "examples" / "payments-corpus")],
-            out_dir=str(out),
-            formats=["jsonl", "txt"],
-            chunk={"strategy": "markdown", "size": 1400, "overlap": 120},
-            quality={"min_chars": 80, "reject_secrets": True},
-        )
-        records, manifest = build_dataset(config)
-        required = [
-            out / "dataset.jsonl",
-            out / "dataset.txt",
-            out / "dataset.sqlite",
-            out / "manifest.json",
-        ]
-        assert records, "the reference corpus produced no records"
-        assert all(path.exists() for path in required), "one or more artifacts are missing"
-        persisted = json.loads((out / "manifest.json").read_text(encoding="utf-8"))
-        assert persisted["chunks_exported"] == len(records)
-        assert manifest["documents_loaded"] == 3
-        print(f"[OK] {len(records)} chunks from 3 documents; JSONL/TXT/SQLite/manifest verified")
+    if OUTPUT.exists():
+        shutil.rmtree(OUTPUT)
+    config = BuildConfig(
+        inputs=[str(ROOT / "examples" / "sample.txt")],
+        out_dir=str(OUTPUT),
+        formats=["jsonl", "txt"],
+        quality={"min_chars": 40, "reject_secrets": True},
+    )
+    records, manifest = build_dataset(config)
+    required = ["dataset.jsonl", "dataset.txt", "dataset.sqlite", "manifest.json"]
+    missing = [name for name in required if not (OUTPUT / name).is_file()]
+    lines = (OUTPUT / "dataset.jsonl").read_text(encoding="utf-8").splitlines()
+    valid = [json.loads(line) for line in lines]
+    if missing or not records or len(valid) != len(records) or manifest["ingestion_errors"]:
+        raise SystemExit(f"Smoke failed: missing={missing}, records={len(records)}, errors={manifest['ingestion_errors']}")
+    print(f"[OK] {manifest['documents_loaded']} document; {len(records)} chunks; {len(required)} artifacts")
     return 0
 
 

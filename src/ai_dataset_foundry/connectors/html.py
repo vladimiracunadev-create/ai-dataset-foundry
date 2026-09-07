@@ -10,7 +10,7 @@ def load_html(path: Path) -> list[DocumentRecord]:
     try:
         from bs4 import BeautifulSoup
     except ImportError as exc:
-        raise RuntimeError("HTML support requires: pip install -e '.[web]'") from exc
+        raise RuntimeError("HTML support requires: uv sync --extra web") from exc
 
     source_hash = sha256_file(path)
     html = path.read_text(encoding="utf-8", errors="replace")

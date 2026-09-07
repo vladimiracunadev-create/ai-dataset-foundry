@@ -1,5 +1,5 @@
-Las redes neuronales artificiales son modelos computacionales inspirados de manera general en redes de unidades conectadas.
+AI Dataset Foundry convierte contenido heterogéneo en registros trazables que otros sistemas pueden usar para experimentos de aprendizaje automático.
 
-Antes del entrenamiento es necesario construir un corpus confiable. El corpus debe preservar procedencia, calidad, licencias y transformaciones aplicadas.
+Una ejecución conserva el origen, calcula hashes, normaliza texto, elimina duplicados, segmenta el contenido y registra decisiones de calidad. El resultado no es automáticamente una verdad ni una autorización de uso: la curación, los derechos y la evaluación requieren responsables humanos.
 
-AI Dataset Foundry convierte fuentes heterogéneas en registros normalizados que pueden exportarse a formatos como JSONL, TXT o Parquet.
+JSONL funciona como contrato de intercambio; cada línea contiene un fragmento, identidad documental, metadata, procedencia y resultado de calidad. El manifest explica con qué entradas y parámetros se produjo el conjunto.

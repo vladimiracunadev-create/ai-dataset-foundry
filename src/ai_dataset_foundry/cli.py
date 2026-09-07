@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import webbrowser
 from pathlib import Path
 from typing import Annotated, Optional
 
@@ -73,6 +74,30 @@ def validate(config: Annotated[Path, typer.Argument(exists=True, dir_okay=False)
     cfg = BuildConfig.from_yaml(config)
     console.print("[green]Configuration valid[/green]")
     console.print_json(data=cfg.model_dump())
+
+
+@app.command()
+def serve(
+    host: Annotated[str, typer.Option(help="Bind address; keep 127.0.0.1 for local use")] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Local HTTP port")] = 8765,
+    open_browser: Annotated[bool, typer.Option("--open/--no-open")] = True,
+) -> None:
+    """Start the compact local web interface."""
+    try:
+        import uvicorn
+    except ImportError as exc:
+        raise RuntimeError("UI support requires: uv sync --extra ui") from exc
+    if open_browser:
+        webbrowser.open(f"http://{host}:{port}")
+    uvicorn.run("ai_dataset_foundry.webapp:create_app", host=host, port=port, factory=True)
+
+
+@app.command()
+def desktop() -> None:
+    """Open the Windows desktop interface backed by the local server."""
+    from ai_dataset_foundry.desktop import main
+
+    main()
 
 
 if __name__ == "__main__":

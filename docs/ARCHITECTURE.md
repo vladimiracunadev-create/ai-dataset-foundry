@@ -1,113 +1,80 @@
 # Arquitectura
 
-## Dos arquitecturas, un contrato limpio
+## Principio rector
 
-El repositorio contiene un motor operativo de datasets y un caso de referencia sobre pagos. La frontera es intencional: el core procesa `DocumentRecord` y `ChunkRecord`; no importa SDK de un PSP ni interpreta PAN. Los documentos de pago enseñan una arquitectura de producción, pero no la declaran implementada.
-
-## Foundry operativa
+La adquisición de una fuente y la preparación de un dataset son problemas distintos. Cada conector traduce su modalidad a `DocumentRecord`; desde ese punto, el pipeline común opera sin saber si el texto vino de una página PDF, una fila CSV o un archivo Git.
 
 ```mermaid
 flowchart TB
-    subgraph Acquisition[Adquisición]
-        F[Archivos] --> R[Router]
-        W[Web] --> R
-        G[Git] --> R
+    subgraph Sources[Fuentes no confiables]
+        PDF[PDF/DOCX]
+        WEB[HTML/Web]
+        GIT[Git/código]
+        DATA[TXT/MD/CSV/JSON]
     end
-    R --> D[DocumentRecord]
-    D --> N[Unicode + limpieza]
-    N --> DD[Exact/SimHash dedup]
-    DD --> CH[Chunking]
-    CH --> Q[Calidad + privacidad ligera]
-    Q --> CR[ChunkRecord]
-    CR --> E1[JSONL]
-    CR --> E2[TXT]
-    CR --> E3[Parquet]
-    CR --> E4[(SQLite)]
-    CR --> M[Manifest]
+    Sources --> ROUTER[Router de conectores]
+    ROUTER --> DOC[DocumentRecord]
+    DOC --> PROC[Procesadores puros]
+    PROC --> CHUNK[ChunkRecord]
+    CHUNK --> EXPORT[Exportadores]
+    CHUNK --> STORE[(SQLite)]
+    EXPORT --> MANIFEST[Manifest]
+    STORE --> MANIFEST
 ```
 
-### Capas y responsabilidades
+## Capas
 
-1. `connectors/`: traduce fuentes a documentos y conserva localizador, tipo, metadatos y hash.
-2. `processors/`: transformaciones deterministas sin I/O externo.
-3. `pipeline.py`: orquesta, aísla errores por input y construye el manifiesto.
-4. `exporters/` y `storage/`: materializan el contrato de salida.
-5. `cli.py`: experiencia de operador; no contiene reglas de procesamiento.
+| Capa | Responsabilidad | Contrato |
+| --- | --- | --- |
+| `connectors` | localizar, abrir y extraer | `list[DocumentRecord]` |
+| `processors` | normalizar, limpiar, chunk, dedup, calidad | funciones deterministas |
+| `pipeline` | orquestar, aislar errores, contar y manifestar | `(records, manifest)` |
+| `exporters` | serializar el mismo conjunto lógico | rutas de artefactos |
+| `storage` | catálogo consultable local | SQLite transaccional |
+| `webapp` | API loopback, uploads y descargas | HTTP local |
+| `desktop` | ventana Windows sobre la webapp | mismo frontend/API |
 
-### Invariantes
+## Modelo de dominio
 
-- Los originales no se modifican.
-- Los IDs derivan de fuente, posición y contenido para ser estables.
-- Un input fallido no invalida los demás; queda registrado en `ingestion_errors`.
-- Solo chunks aceptados entran a exportación.
-- Los formatos de salida representan el mismo conjunto lógico.
+`SourceInfo` identifica clase, localizador, título y licencia opcional. `DocumentRecord` representa una unidad extraída —una página PDF, fila o archivo— con metadata y hash de fuente. `ChunkRecord` representa contenido final, enlaza al documento y añade hash de contenido y decisión de calidad.
 
-## Arquitectura de referencia para pagos
+La relación explícita evita que un modelo reciba texto sin origen y permite retirar o reconstruir fragmentos cuando cambia una fuente.
+
+## Invariantes
+
+- Nunca sobrescribir originales.
+- Usar IDs estables derivados de identidad, posición y contenido.
+- Preservar estado/error por input; una fuente fallida no borra las válidas.
+- Exportar únicamente registros aceptados.
+- Mantener equivalencia lógica entre formatos.
+- No ejecutar macros, scripts ni código adquirido.
+- Escuchar en `127.0.0.1` por defecto; exponer la UI requiere un diseño de autenticación separado.
+
+## Extensión de conectores
+
+Un conector nuevo debe definir detección, extracción, granularidad, metadata, hashing, encoding, límites, errores y seguridad. Se registra en `connectors/router.py` y añade fixtures de fuente válida, vacía y malformada.
+
+## Escalado futuro
 
 ```mermaid
 flowchart LR
-    C[Cliente] --> EDGE[Checkout / API edge]
-    EDGE --> PI[Payment Intent]
-    PI --> RISK[Risk + policy]
-    PI --> ORCH[Orquestador]
-    ORCH --> A[Adaptador tarjetas]
-    ORCH --> B[Adaptador A2A]
-    ORCH --> C1[Adaptador wallet/alt]
-    A & B & C1 --> EXT[PSP / adquirente / banco]
-    EXT --> WH[Webhook ingress]
-    WH --> BUS[(Event bus)]
-    BUS --> SM[State machine]
-    SM --> LED[(Ledger doble entrada)]
-    EXT --> REC[Reportes / payouts]
-    REC --> RECON[Conciliación]
-    LED --> RECON
-    RECON --> OPS[Excepciones operativas]
+    API[API/CLI/UI] --> Q[(Cola)]
+    Q --> W1[Workers texto]
+    Q --> W2[Workers OCR/Tika]
+    Q --> W3[Workers web]
+    W1 & W2 & W3 --> RAW[(Object storage inmutable)]
+    W1 & W2 & W3 --> REG[(Dataset registry)]
+    REG --> LAKE[(Parquet/lakehouse)]
+    REG --> VEC[(Vector index)]
 ```
 
-### Bounded contexts
+Docker tendrá sentido en esta etapa para aislar Tika/OCR, object storage, colas y bases; no es requisito artificial del pipeline local.
 
-| Contexto | Posee | No debe poseer |
-| --- | --- | --- |
-| Checkout | selección y consentimiento | saldo contable |
-| Payment orchestration | intentos, routing, referencias | pedido comercial completo |
-| Risk | señales, reglas, decisiones versionadas | verdad de settlement |
-| Connector/adapters | traducción al proveedor | política global de negocio |
-| Ledger | asientos y balances | llamadas a PSP |
-| Reconciliation | matching y excepciones | mutación silenciosa de asientos |
-| Disputes | casos, plazos, evidencia | secretos de autenticación |
+## Decisiones registradas
 
-## Contratos de datos recomendados
-
-Todo comando incluye `command_id`, `idempotency_key`, `occurred_at`, importe entero, moneda ISO 4217 cuando aplique, referencia de negocio y versión de esquema. Todo evento incluye `event_id`, `aggregate_id`, secuencia/version, estado nativo, estado normalizado y procedencia.
-
-No uses una tabla `payments` con un booleano `paid`. Separa:
-
-- `orders` y obligaciones comerciales;
-- `payment_intents` y monto objetivo;
-- `payment_attempts` y cada interacción con un proveedor;
-- `provider_events` como inbox idempotente;
-- `ledger_transactions` y `ledger_entries` append-only;
-- `settlement_batches`, `payouts` y `reconciliation_items`;
-- `refunds`, `returns` y `disputes`.
-
-## Consistencia y mensajería
-
-Dentro de una base, persiste cambio de estado y evento de salida con transactional outbox. Para entrada, usa inbox único por proveedor/evento. Publica eventos at-least-once y diseña consumidores idempotentes. No prometas exactly-once distribuido: demuestra efecto-una-vez mediante restricciones, claves y reconciliación.
-
-## Resiliencia
-
-- timeout por fase y presupuesto total;
-- retry solo para error transitorio y operación idempotente;
-- circuit breaker por dependencia/operación;
-- bulkheads para que un proveedor no agote workers;
-- backpressure y DLQ observable;
-- degradación: retirar un medio sin tumbar checkout;
-- consulta/reconciliación para resultado ambiguo.
-
-## Escalado y datos
-
-Particiona por merchant/aggregate sin romper ordering requerido. Separa OLTP financiero de analytics. Los balances se derivan de entradas inmutables y pueden mantener snapshots comprobables. Cifra datos en tránsito y reposo; tokeniza credenciales; aplica retención por categoría.
-
-## Evolución productiva de la foundry
-
-OCR/Tika, almacenamiento de objetos inmutable, registro PostgreSQL, colas, workers distribuidos, DVC/lakeFS, anotación, evaluaciones y modo air-gapped son extensiones razonables. Docker será útil cuando existan esos servicios o sandboxes; no aporta evidencia nueva al pipeline local actual.
+- Python: ecosistema documental/ML amplio y distribución directa.
+- Pydantic: configuración validada y límites declarativos.
+- JSONL: streaming, interoperabilidad y diffs razonables.
+- SQLite: catálogo cero-operación para demo local.
+- FastAPI + vanilla UI: API tipada y frontend pequeño.
+- pywebview: aplicación Windows reutilizando la UI localhost.

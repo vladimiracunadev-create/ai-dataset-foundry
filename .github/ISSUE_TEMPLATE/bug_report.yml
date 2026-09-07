@@ -5,7 +5,7 @@ labels: [bug]
 body:
   - type: markdown
     attributes:
-      value: No incluyas PAN, CVV, secretos, PII ni datos de clientes. Usa Security para vulnerabilidades.
+      value: No incluyas secretos, credenciales, PII ni datos privados. Usa Security para vulnerabilidades.
   - type: input
     id: version
     attributes:

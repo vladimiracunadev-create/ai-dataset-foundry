@@ -10,7 +10,7 @@ def load_pdf(path: Path) -> list[DocumentRecord]:
     try:
         from pypdf import PdfReader
     except ImportError as exc:
-        raise RuntimeError("PDF support requires: pip install -e '.[documents]'") from exc
+        raise RuntimeError("PDF support requires: uv sync --extra documents") from exc
 
     source_hash = sha256_file(path)
     reader = PdfReader(str(path))

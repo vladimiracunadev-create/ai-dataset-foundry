@@ -30,10 +30,12 @@ def load_path(path: Path) -> list[DocumentRecord]:
 
 def ingest(locator: str, recursive: bool = True) -> list[DocumentRecord]:
     if locator.startswith(("http://", "https://")):
-        if locator.endswith(".git") or "github.com/" in locator and not locator.endswith((".pdf", ".html")):
-            if locator.endswith(".git"):
-                from .git import load_git
-                return load_git(locator)
+        if locator.endswith(".git") or (
+            "github.com/" in locator and not locator.endswith((".pdf", ".html"))
+        ):
+            from .git import load_git
+
+            return load_git(locator)
         from .web import load_url
         return load_url(locator)
 

@@ -1,161 +1,195 @@
-# 🏭 AI Dataset Foundry · Payment Systems Knowledge Lab
+# 🏭 AI Dataset Foundry
 
-## De fuentes heterogéneas a datasets auditables, con sistemas de pago como caso de referencia
+## De documentos dispersos a datasets auditables para redes neuronales, fine-tuning y RAG
 
 [![CI](https://github.com/vladimiracunadev-create/ai-dataset-foundry/actions/workflows/ci.yml/badge.svg)](https://github.com/vladimiracunadev-create/ai-dataset-foundry/actions/workflows/ci.yml)
+[![Security](https://github.com/vladimiracunadev-create/ai-dataset-foundry/actions/workflows/security.yml/badge.svg)](https://github.com/vladimiracunadev-create/ai-dataset-foundry/actions/workflows/security.yml)
 [![Pages](https://github.com/vladimiracunadev-create/ai-dataset-foundry/actions/workflows/pages.yml/badge.svg)](https://github.com/vladimiracunadev-create/ai-dataset-foundry/actions/workflows/pages.yml)
+[![Release](https://img.shields.io/github/v/release/vladimiracunadev-create/ai-dataset-foundry?display_name=tag)](https://github.com/vladimiracunadev-create/ai-dataset-foundry/releases)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![License MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
+[![MIT](https://img.shields.io/badge/license-MIT-22c55e.svg)](LICENSE)
 
-**AI Dataset Foundry** es un pipeline local-first para construir corpus trazables antes de entrenar, ajustar o conectar modelos mediante RAG. El repositorio incorpora un **laboratorio de conocimiento sobre pagos**: una taxonomía amplia de instrumentos, rails, actores, mensajes, controles y operación que permite estudiar cómo funciona un pago real sin confundir una simulación educativa con un gateway certificado.
+**AI Dataset Foundry** es un pipeline local-first que adquiere contenido desde archivos, web y repositorios; lo normaliza, limpia, deduplica, segmenta y valida; conserva lineage hasta la fuente; y exporta corpus reutilizables por sistemas de aprendizaje automático.
 
-[🌐 Sitio](https://vladimiracunadev-create.github.io/ai-dataset-foundry/) · [⚡ Inicio rápido](#-inicio-rápido) · [💳 Atlas de pagos](docs/PAYMENT_METHODS.md) · [🏗️ Arquitectura](docs/ARCHITECTURE.md) · [🛡️ Seguridad](docs/SECURITY_MODEL.md) · [✅ Estado](STATUS.md)
+[🌐 Sitio](https://vladimiracunadev-create.github.io/ai-dataset-foundry/) · [⬇️ Windows y Android](https://github.com/vladimiracunadev-create/ai-dataset-foundry/releases) · [⚡ Ejecutar](#-inicio-rápido) · [📚 Guía completa](docs/GETTING_STARTED.md) · [✅ Estado verificable](STATUS.md) · [🧭 Roadmap](ROADMAP.md)
 
 > [!IMPORTANT]
-> Este repositorio es una demo educativa y una herramienta de ingeniería de datos. **No mueve dinero, no almacena PAN/CVV, no es un PSP, adquirente, emisor, cámara ni sistema de liquidación**, y no sustituye asesoría legal, regulatoria, contable, tributaria o de seguridad. Las integraciones reales exigen contratos, credenciales de sandbox, certificaciones y controles propios del proveedor y de la jurisdicción.
+> Esta herramienta **prepara datasets; no entrena modelos**. Un archivo extraído no se vuelve automáticamente verdadero, legal, representativo ni apto para aprendizaje. La foundry aporta trazabilidad y controles técnicos; la autorización, curación de dominio, evaluación y decisión de uso siguen siendo humanas.
 
-## 🎯 Qué demuestra
+## 🎯 El problema que resuelve
 
-| Superficie | Evidencia verificable |
-| --- | --- |
-| Pipeline | ingesta → normalización → limpieza → deduplicación → chunking → calidad → exportación |
-| Fuentes | texto/Markdown, PDF, DOCX, HTML, URL, Git, JSON/JSONL y CSV |
-| Salidas | JSONL, TXT, Parquet, manifiesto y catálogo SQLite |
-| Trazabilidad | identificadores estables, SHA-256 de fuente y contenido, metadatos y motivos de rechazo |
-| Pagos | atlas de 9 familias y 40 variantes, con ciclo, riesgos, conciliación y tecnologías relacionadas |
-| Alcance real | motor operativo local; contenido de pagos documentado; conexiones externas no implementadas |
-| Calidad | 7 pruebas automatizadas en 5 archivos; CI en Python 3.11, 3.12 y 3.13 |
+El conocimiento útil rara vez llega en el formato que espera un modelo. Está repartido entre manuales PDF, documentos Word, páginas web, repositorios, Markdown, CSV y JSON; contiene duplicados, menús, saltos rotos, secretos, versiones contradictorias y fragmentos sin contexto.
 
-Detalle y método de verificación: [`STATUS.md`](STATUS.md).
-
-## 🧭 Mapa del sistema
+La foundry convierte ese material en un contrato común:
 
 ```mermaid
 flowchart LR
-    A[Fuentes autorizadas] --> B[Conectores]
+    A[PDF · DOCX · Web · Git<br/>TXT · MD · HTML · CSV · JSON] --> B[Extraer]
     B --> C[Normalizar y limpiar]
     C --> D[Deduplicar]
-    D --> E[Segmentar]
+    D --> E[Segmentar con contexto]
     E --> F[Privacidad y calidad]
-    F --> G[(JSONL / TXT / Parquet / SQLite)]
-    G --> H[Entrenamiento, evaluación o RAG]
-
-    P[Corpus de pagos] -. caso de referencia .-> A
-    R[Manifiesto + hashes] -. evidencia .-> G
+    F --> G[(JSONL · TXT · Parquet · SQLite)]
+    G --> H[Pretraining]
+    G --> I[Fine-tuning]
+    G --> J[Embeddings / RAG]
+    G --> K[Evaluación]
+    B -. hash + metadatos .-> L[Manifest y lineage]
+    F -. decisiones .-> L
+    G -. outputs .-> L
 ```
 
-La foundry y el dominio de pagos están separados deliberadamente: el motor no necesita conocer tarjetas o transferencias; el corpus conserva procedencia, contexto y vocabulario del dominio.
+## ✅ Estado verificable · v0.2.0
 
-## 💳 Cobertura del laboratorio de pagos
+| Superficie | Estado | Evidencia |
+| --- | --- | --- |
+| CLI y pipeline | `OPERATIVO` | build, stats, validate y pruebas automatizadas |
+| Interfaz localhost | `OPERATIVO` | carga de archivos/rutas/URL, configuración, ejecución y descargas |
+| Aplicación Windows | `RELEASE` | ejecutable PyInstaller con UI local embebida |
+| Aplicación Android | `RELEASE-MÍNIMA` | APK offline para texto/Markdown/JSON/CSV; sin permiso Internet |
+| PDF, DOCX, HTML, web y Git | `OPERATIVO-CON-EXTRAS` | adaptadores aislados y manejo de errores por fuente |
+| OCR para escaneados | `DOCUMENTADO/PLANIFICADO` | no se presenta como implementado en v0.2.0 |
+| JSONL, TXT y SQLite | `OPERATIVO` | smoke end-to-end |
+| Parquet | `OPERATIVO-CON-EXTRA` | PyArrow |
+| Actualización incremental | `DISEÑADO/PLANIFICADO` | hashes ya existen; registro de versiones aún pendiente |
 
-El atlas organiza los medios por **instrumento**, **canal**, **rail** y **modelo de liquidación**; evita el error frecuente de llamar «medio de pago» a todo.
+Los conteos, límites y comandos para comprobarlos están en [`STATUS.md`](STATUS.md).
 
-| Familia | Incluye |
-| --- | --- |
-| Efectivo y equivalentes | billetes, monedas, contra entrega, vouchers y stored value cerrado |
-| Papel | cheque, vale vista/cashier's check, giro y money order |
-| Tarjetas | crédito, débito, prepago, charge, commercial, virtual, contactless y card-on-file |
-| Cuenta a cuenta | TEF, ACH, débito directo, transferencias inmediatas, wire y RTGS |
-| Billeteras | wallets pass-through, saldo almacenado, super-app, NFC, QR y wearables |
-| Crédito en checkout | cuotas del emisor, BNPL, financiamiento POS y pay-later B2B |
-| Cobro remoto | payment link, invoice payment, QR, USSD, carrier billing y pago en agente/corresponsal |
-| Transfronterizo | corresponsalía, SWIFT, remesas, FX, adquirencia local y cross-border acquiring |
-| Activos digitales | criptoactivos, stablecoins, CBDC y dinero tokenizado, con límites regulatorios explícitos |
+## 📥 Modalidades de lectura
 
-La matriz completa, incluidos actores, finalidades, reversibilidad y riesgos, está en [`docs/PAYMENT_METHODS.md`](docs/PAYMENT_METHODS.md). El flujo end-to-end está en [`docs/PAYMENT_LIFECYCLE.md`](docs/PAYMENT_LIFECYCLE.md).
+| Fuente | Implementación actual | Qué conserva | Evolución relacionada |
+| --- | --- | --- | --- |
+| TXT, Markdown y código | `pathlib`, UTF-8 tolerante | ruta, tipo, hash y estructura textual | tree-sitter para chunking semántico de código |
+| PDF con texto | `pypdf` | página, total de páginas y hash | layout detection, tablas y encabezados |
+| PDF escaneado | no implementado | — | OCRmyPDF, Tesseract, PaddleOCR, docTR |
+| Word `.docx` | `python-docx` | párrafos, tablas y hash | estilos, comentarios, imágenes y relaciones |
+| HTML local | Beautiful Soup | título, texto visible y hash | Readability/Tika para formatos complejos |
+| Página web | Requests + Trafilatura/BS4 | URL, título, content-type, status y hash | crawler con robots, politeness, cache y sitemap |
+| Repositorio Git | Git shallow clone + router | repo, ruta, lenguaje y hash | commit pin, incremental diff y submodules controlados |
+| JSON / JSONL | `json` | índice/línea y objeto original | JSONPath y esquemas configurables |
+| CSV | `csv.DictReader` | fila y columnas originales | mapping, encoding/dialect detection |
+
+Profundidad, límites y bibliotecas alternativas: [`docs/CONNECTORS.md`](docs/CONNECTORS.md).
 
 ## ⚡ Inicio rápido
 
-Requisitos: Python 3.11 o superior y Git. Parquet, PDF, DOCX y Web son extras opcionales.
+Requisitos: `uv`, Python 3.11+ y Git. Docker **no es necesario** para el núcleo actual. `uv.lock` fija la resolución completa sin impedir que el wheel se instale con cualquier cliente Python estándar.
 
 ```bash
-python -m venv .venv
+uv sync --extra all --extra dev --locked
+uv run python scripts/doctor.py
 ```
 
-```bash
-# Linux/macOS
-source .venv/bin/activate
+### Interfaz moderna en localhost
 
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
+```bash
+foundry serve
+# abre http://127.0.0.1:8765
 ```
 
+La interfaz permite arrastrar archivos, indicar directorios/URL/repositorios, elegir chunking y formatos, ejecutar el pipeline y descargar dataset, SQLite y manifest.
+
+### CLI reproducible
+
 ```bash
-python -m pip install --upgrade pip
-python -m pip install -e ".[all,dev]"
-python scripts/doctor.py
+foundry build --config examples/config.yaml
+foundry stats work/example-from-config/dataset.jsonl
 python scripts/smoke.py
 ```
 
-Construir el caso de referencia de pagos:
+### Aplicación Windows
+
+Descarga `AI-Dataset-Foundry-Windows.exe` desde Releases o ejecuta:
 
 ```bash
-foundry build --config examples/payments.yaml
-foundry stats work/payments-lab/dataset.jsonl
+uv sync --extra desktop --locked
+uv run foundry desktop
 ```
 
-O ejecutar el ejemplo mínimo:
+### Android
 
-```bash
-foundry build examples/sample.txt --out work/demo --format jsonl
-```
+El APK mínimo procesa localmente TXT, Markdown, JSON y CSV, segmenta el contenido y permite guardar JSONL. No solicita permiso de Internet. PDF/Word/OCR permanecen en la edición Python/Windows hasta contar con parsers móviles que no degraden tamaño, seguridad y trazabilidad.
 
-El pipeline **no sobrescribe los originales**. Cada ejecución produce artefactos derivados y un `manifest.json` que documenta entradas, configuración, conteos, errores y salidas.
+## 🧠 Cuatro destinos, cuatro contratos
 
-## 🧪 Ruta pedagógica
+| Destino | Unidad útil | Transformación adicional necesaria |
+| --- | --- | --- |
+| Pretraining/continued pretraining | texto limpio a gran escala | tokenizer, packing, mezcla, dedup global y control de contaminación |
+| Fine-tuning supervisado | ejemplo de instrucción y respuesta | authoring/labeling, formato `messages`, rubricas y split |
+| RAG | chunk recuperable con contexto | embeddings, índice, filtros, retrieval y evaluación grounded |
+| Evaluación | caso con entrada, referencia y criterio | holdout, scoring, adversariales y versionado independiente |
 
-1. Lee [`docs/PAYMENTS_PRIMER.md`](docs/PAYMENTS_PRIMER.md) para separar instrumento, canal, rail, esquema, clearing y settlement.
-2. Recorre [`docs/PAYMENT_METHODS.md`](docs/PAYMENT_METHODS.md) y selecciona dos familias con propiedades distintas.
-3. Sigue una compra en [`docs/PAYMENT_LIFECYCLE.md`](docs/PAYMENT_LIFECYCLE.md), desde la intención hasta la conciliación.
-4. Modela estados e idempotencia con [`docs/INTEGRATION_PLAYBOOK.md`](docs/INTEGRATION_PLAYBOOK.md).
-5. Diseña controles con [`docs/SECURITY_MODEL.md`](docs/SECURITY_MODEL.md) y [`docs/RISK_AND_COMPLIANCE.md`](docs/RISK_AND_COMPLIANCE.md).
-6. Opera incidentes, liquidación y disputas con [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
-7. Ejecuta la foundry sobre `examples/payments-corpus/` y audita el manifiesto resultante.
+La foundry genera un corpus neutral y trazable. No inventa respuestas supervisadas ni confunde chunks de RAG con ejemplos de fine-tuning. Lee [`docs/TRAINING_READINESS.md`](docs/TRAINING_READINESS.md).
 
-## 🏗️ Decisiones de producción que el laboratorio enseña
+## 🏗️ Decisiones de ingeniería
 
-- El pedido, el intento, la autorización, la captura, el movimiento de fondos y el asiento contable son entidades distintas.
-- «HTTP 200» no significa «dinero liquidado»; el estado definitivo depende del rail y puede cambiar por devolución o disputa.
-- Toda operación mutante necesita idempotencia, claves de correlación y una máquina de estados persistente.
-- Los webhooks son mensajes no confiables hasta verificar firma, timestamp, replay y correspondencia con una consulta autenticada.
-- La conciliación y el ledger son parte del producto, no tareas administrativas posteriores.
-- La minimización de datos reduce alcance PCI, superficie de fraude y costo operativo.
-- Un medio alternativo no es «otra tarjeta»: cambian finality, reembolsos, identidad, mensajes, disponibilidad y riesgo.
+- Los originales nunca se sobrescriben.
+- Un `DocumentRecord` separa adquisición de procesamiento.
+- Cada chunk tiene ID estable, hash de fuente y hash de contenido.
+- Los errores se aíslan por input y quedan en el manifest.
+- La deduplicación exacta y SimHash ocurre antes de exportar.
+- La privacidad ligera es una barrera auxiliar, no DLP.
+- JSONL es el contrato interoperable; SQLite es catálogo, no vector database.
+- La UI localhost escucha en loopback por defecto.
+- Windows reutiliza el mismo servidor y frontend, evitando lógica duplicada.
 
-## 🗂️ Documentación por audiencia
+## 📚 Documentación por audiencia
 
-| Quiero… | Documento |
+| Necesidad | Documento |
 | --- | --- |
-| entender el proyecto en 10 minutos | [`README.md`](README.md) |
-| comprobar qué existe de verdad | [`STATUS.md`](STATUS.md) |
-| comprender pagos desde cero | [`docs/PAYMENTS_PRIMER.md`](docs/PAYMENTS_PRIMER.md) |
-| comparar todos los medios cubiertos | [`docs/PAYMENT_METHODS.md`](docs/PAYMENT_METHODS.md) |
-| seguir autorización, clearing y settlement | [`docs/PAYMENT_LIFECYCLE.md`](docs/PAYMENT_LIFECYCLE.md) |
-| diseñar servicios y contratos | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
-| integrar un PSP sin errores clásicos | [`docs/INTEGRATION_PLAYBOOK.md`](docs/INTEGRATION_PLAYBOOK.md) |
-| operar pagos, disputas y conciliación | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) |
-| tratar seguridad, fraude y compliance | [`docs/SECURITY_MODEL.md`](docs/SECURITY_MODEL.md) · [`docs/RISK_AND_COMPLIANCE.md`](docs/RISK_AND_COMPLIANCE.md) |
-| conocer el contrato de datos | [`docs/DATASET_SCHEMA.md`](docs/DATASET_SCHEMA.md) |
-| configurar la foundry | [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) |
-| revisar términos y fuentes | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) · [`docs/REFERENCES.md`](docs/REFERENCES.md) |
+| ejecutar en 5 minutos | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) |
+| entender cada modalidad de lectura | [`docs/CONNECTORS.md`](docs/CONNECTORS.md) |
+| comprender el pipeline completo | [`docs/PIPELINE.md`](docs/PIPELINE.md) |
+| diseñar extensiones | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| configurar builds | [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) |
+| consumir JSONL/Parquet/SQLite | [`docs/DATASET_SCHEMA.md`](docs/DATASET_SCHEMA.md) |
+| decidir pretraining, SFT, RAG o eval | [`docs/TRAINING_READINESS.md`](docs/TRAINING_READINESS.md) |
+| gobernar derechos, PII y lineage | [`docs/GOVERNANCE.md`](docs/GOVERNANCE.md) |
+| medir calidad y evitar leakage | [`docs/QUALITY_AND_EVALUATION.md`](docs/QUALITY_AND_EVALUATION.md) |
+| actualizar datasets sin perder historia | [`docs/INCREMENTAL_UPDATES.md`](docs/INCREMENTAL_UPDATES.md) |
+| operar y resolver fallos | [`docs/RUNBOOK.md`](docs/RUNBOOK.md) |
+| evaluar el proyecto en 10 minutos | [`RECRUITER.md`](RECRUITER.md) |
 
-## 🛡️ Seguridad, privacidad y derechos
+## 🛡️ Seguridad y límites
 
-Nunca ingieras PAN, CVV/CVC, PIN, track data, llaves privadas, secretos de API ni datos reales de clientes. Los ejemplos son sintéticos. El detector incluido es deliberadamente liviano y **no equivale a DLP, PCI DSS, AML/KYC ni evaluación de fraude**. Lee [`SECURITY.md`](SECURITY.md), [`docs/GOVERNANCE.md`](docs/GOVERNANCE.md) y el modelo de amenazas antes de utilizar fuentes internas.
+No ingieras fuentes sin autorización, credenciales, datos personales innecesarios ni documentos internos en un repositorio público. La extracción de contenido hostil debe aislarse antes de producción. Consulta [`SECURITY.md`](SECURITY.md) y [`docs/GOVERNANCE.md`](docs/GOVERNANCE.md).
 
-## 🧩 Extender el motor
+## 🧪 Verificación
 
-- Nuevo conector: impleméntalo bajo `src/ai_dataset_foundry/connectors/` y regístralo en `router.py`.
-- Nuevo exportador: agrégalo bajo `exporters/` y regístralo en `exporters/__init__.py`.
-- Nueva política de calidad: mantenla determinista, explica sus falsos positivos/negativos y añade pruebas.
-- Integración con PSP: mantenla fuera del núcleo de ingesta y usa exclusivamente sandbox con datos sintéticos.
+```bash
+uv run pytest -q
+uv run ruff check src tests scripts
+uv run python scripts/smoke.py
+uv run python scripts/verify_docs.py
+uv build
+```
 
-Consulta [`CONTRIBUTING.md`](CONTRIBUTING.md) y [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+CI ejecuta pruebas en Python 3.11, 3.12 y 3.13. Los workflows usan permisos mínimos y acciones fijadas a SHA.
 
-## 📜 Licencia y atribución
+## 🗺️ Estructura
 
-Código y documentación bajo [MIT](LICENSE). Los nombres de redes, esquemas, proveedores y estándares pertenecen a sus respectivos titulares y se usan con fines descriptivos. Las fuentes normativas y técnicas se enlazan, no se redistribuyen.
+```text
+src/ai_dataset_foundry/
+├── connectors/        # adquisición por modalidad
+├── processors/        # normalizar, limpiar, deduplicar, chunking, calidad
+├── exporters/         # JSONL, TXT y Parquet
+├── storage/           # catálogo SQLite
+├── ui/                # frontend local compartido
+├── webapp.py          # API localhost
+├── desktop.py         # host de ventana Windows
+└── pipeline.py        # orquestación y manifest
+
+android/               # companion APK offline mínimo
+docs/                  # manual técnico y pedagógico
+examples/              # configuración y corpus sintético
+scripts/               # doctor, smoke y verificación
+site/                  # GitHub Pages
+```
+
+## 📜 Licencia
+
+Código y documentación bajo [MIT](LICENSE). Las fuentes que proceses mantienen sus propios derechos y condiciones; esta licencia no concede permiso sobre datos de terceros.
 
 ---
 
-Hecho con criterio de producción por [Vladimir Acuña](https://github.com/vladimiracunadev-create). Estado documental verificado: **7 de septiembre de 2026**.
+Hecho por [Vladimir Acuña](https://github.com/vladimiracunadev-create) · documentación y estado verificados el **7 de septiembre de 2026**.

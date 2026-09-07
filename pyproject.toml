@@ -4,13 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ai-dataset-foundry"
-version = "0.1.0"
-description = "Local-first pipeline for auditable AI corpora, with a payment-systems knowledge lab."
+version = "0.2.0"
+description = "Local-first pipeline and desktop app for building auditable AI training datasets."
 readme = "README.md"
 requires-python = ">=3.11"
-license = {text = "MIT"}
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{name = "Vladimir Acuña"}]
-keywords = ["datasets", "rag", "fine-tuning", "payments", "data-governance", "provenance"]
+keywords = ["datasets", "rag", "fine-tuning", "machine-learning", "etl", "provenance"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: MIT License",
@@ -38,7 +39,18 @@ web = [
   "trafilatura>=2,<3",
 ]
 parquet = [
-  "pyarrow>=17,<22",
+  "pyarrow>=23.0.1,<24",
+]
+ui = [
+  "fastapi>=0.116,<1",
+  "uvicorn>=0.35,<1",
+  "python-multipart>=0.0.20,<1",
+]
+desktop = [
+  "fastapi>=0.116,<1",
+  "uvicorn>=0.35,<1",
+  "python-multipart>=0.0.20,<1",
+  "pywebview>=6,<7",
 ]
 all = [
   "pypdf>=5,<7",
@@ -46,15 +58,26 @@ all = [
   "requests>=2.32,<3",
   "beautifulsoup4>=4.12,<5",
   "trafilatura>=2,<3",
-  "pyarrow>=17,<22",
+  "pyarrow>=23.0.1,<24",
+  "fastapi>=0.116,<1",
+  "uvicorn>=0.35,<1",
+  "python-multipart>=0.0.20,<1",
 ]
 dev = [
-  "pytest>=8.3,<9",
+  "httpx>=0.28,<1",
+  "pytest>=9.0.3,<10",
   "ruff>=0.8,<1",
+]
+audit = [
+  "pip-audit>=2.10,<3",
+]
+release = [
+  "pyinstaller>=6.15,<7",
 ]
 
 [project.scripts]
 foundry = "ai_dataset_foundry.cli:app"
+foundry-desktop = "ai_dataset_foundry.desktop:main"
 
 [project.urls]
 Homepage = "https://vladimiracunadev-create.github.io/ai-dataset-foundry/"
@@ -65,9 +88,13 @@ Issues = "https://github.com/vladimiracunadev-create/ai-dataset-foundry/issues"
 [tool.hatch.build.targets.wheel]
 packages = ["src/ai_dataset_foundry"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"src/ai_dataset_foundry/ui/index.html" = "ai_dataset_foundry/ui/index.html"
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+cache_dir = "work/.pytest_cache"
 
 [tool.ruff]
 line-length = 100

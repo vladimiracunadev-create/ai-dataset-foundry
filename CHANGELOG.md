@@ -1,24 +1,26 @@
 # Changelog
 
-All notable changes are documented here. The project follows semantic versioning from its
-first stable release; while it is `0.x`, minor versions may include breaking changes.
+Los cambios notables siguen [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## [0.2.0] - 2026-09-07
 
-- Reframed the repository as AI Dataset Foundry with a payment-systems knowledge lab.
-- Added a nine-family atlas covering cash, paper, cards, account-to-account, wallets,
-  embedded credit, remote collection, cross-border and digital assets.
-- Added deep guides for payment lifecycle, integration, security, risk/compliance,
-  operations, architecture, glossary and authoritative references.
-- Added a synthetic payment corpus, reproducible configuration, `doctor`, `smoke` and
-  documentation-coherence checks.
-- Added professional repository policies, explicit maturity labels and a redesigned site.
+### Added
 
-## 0.1.0 - 2026-09-01
+- interfaz compacta en localhost y aplicación Windows basada en el mismo pipeline;
+- aplicación Android offline mínima para lectura textual y exportación JSONL;
+- API local de build y descarga de artefactos;
+- documentación profunda de modalidades, pipeline, entrenamiento, gobierno y operación;
+- CI Android, auditoría de dependencias y release multiplataforma con checksums.
 
-- Functional CLI pipeline.
-- PDF, DOCX, HTML, web, Git, text, Markdown, JSON/JSONL and CSV ingestion.
-- Normalization, cleaning, secret/email flags, exact and SimHash near deduplication.
-- Paragraph, sentence, Markdown and fixed chunking.
-- JSONL, TXT and Parquet exports.
-- Manifest, tests, CI, release and Pages workflows.
+### Changed
+
+- presentación pública, GitHub Pages y metadatos orientados a preparación de datasets para IA;
+- versión canónica elevada a 0.2.0.
+
+## [0.1.0] - 2026-09-01
+
+### Added
+
+- pipeline CLI inicial con conectores de texto, JSON, CSV, PDF, DOCX, HTML, web y Git;
+- normalización, limpieza, chunking, deduplicación, privacidad ligera y calidad;
+- exportadores JSONL, TXT y Parquet, catálogo SQLite y manifest.

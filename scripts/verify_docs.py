@@ -1,12 +1,15 @@
-"""Check local Markdown links and current repository facts used by documentation."""
+"""Audit links, versions, workflow pins and documentation drift."""
 
 from __future__ import annotations
 
 import re
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LINK = re.compile(r"(?<!!)\[[^]]+\]\(([^)]+)\)")
+ACTION = re.compile(r"uses:\s+[^\s@]+@([^\s#]+)")
+FULL_SHA = re.compile(r"[0-9a-f]{40}")
 
 
 def local_target(document: Path, raw: str) -> Path | None:
@@ -18,29 +21,41 @@ def local_target(document: Path, raw: str) -> Path | None:
 
 def main() -> int:
     failures: list[str] = []
-    markdown = sorted(ROOT.rglob("*.md"))
+    markdown = [p for p in sorted(ROOT.rglob("*.md")) if not {".git", ".venv"} & set(p.parts)]
     for document in markdown:
-        if any(part in {".git", ".venv"} for part in document.parts):
-            continue
         text = document.read_text(encoding="utf-8")
         for raw in LINK.findall(text):
             target = local_target(document, raw)
             if target is not None and not target.exists():
-                failures.append(f"{document.relative_to(ROOT)} -> {raw}")
+                failures.append(f"broken link: {document.relative_to(ROOT)} -> {raw}")
+        if "mÃ" in text or "ðŸ" in text or "â€" in text:
+            failures.append(f"possible mojibake: {document.relative_to(ROOT)}")
 
-    tests = list((ROOT / "tests").glob("test_*.py"))
-    workflows = list((ROOT / ".github" / "workflows").glob("*.yml"))
-    if len(tests) != 5:
-        failures.append(f"STATUS expects 5 test files; found {len(tests)}")
-    if len(workflows) != 3:
-        failures.append(f"STATUS expects 3 workflows; found {len(workflows)}")
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    version = project["project"]["version"]
+    init_text = (ROOT / "src/ai_dataset_foundry/__init__.py").read_text(encoding="utf-8")
+    android_text = (ROOT / "android/app/build.gradle.kts").read_text(encoding="utf-8")
+    for source, text in {"__init__": init_text, "Android": android_text, "STATUS": (ROOT / "STATUS.md").read_text(encoding="utf-8")}.items():
+        if version not in text:
+            failures.append(f"current version {version} missing from {source}")
+
+    workflows = sorted((ROOT / ".github/workflows").glob("*.yml"))
+    expected = {"ci.yml", "pages.yml", "release.yml", "security.yml"}
+    found = {path.name for path in workflows}
+    if found != expected:
+        failures.append(f"workflow inventory differs: expected {sorted(expected)}, found {sorted(found)}")
+    for workflow in workflows:
+        for ref in ACTION.findall(workflow.read_text(encoding="utf-8")):
+            if not FULL_SHA.fullmatch(ref):
+                failures.append(f"unpinned action: {workflow.name} -> {ref}")
 
     if failures:
-        print("Documentation verification failed:")
+        print("Repository coherence verification failed:")
         for failure in failures:
             print(f"- {failure}")
         return 1
-    print(f"[OK] {len(markdown)} Markdown files, local links, 5 test files and 3 workflows")
+    tests = len(list((ROOT / "tests").glob("test_*.py")))
+    print(f"[OK] version {version}; {len(markdown)} Markdown; {tests} Python test files; {len(workflows)} pinned workflows")
     return 0
 
 

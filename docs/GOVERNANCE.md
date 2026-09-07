@@ -1,42 +1,20 @@
-# Gobierno de datos
+# Gobierno, derechos y procedencia
 
-Preparar datos de entrenamiento o RAG es un problema de derechos, privacidad, seguridad y calidad, no solo parsing.
+Un pipeline técnicamente correcto puede producir un dataset legal o éticamente inaceptable. Antes de adquirir una fuente registra propietario, licencia o base de autorización, propósito, jurisdicción, sensibilidad, retención y contacto responsable.
 
-## Gates obligatorios
+## Puertas de decisión
 
-| Gate | Evidencia mínima |
-| --- | --- |
-| Autoridad | propietario/licencia/términos y uso permitido |
-| Propósito | finalidad, audiencia, modelo y uso prohibido |
-| Privacidad | categorías, base, minimización, retención y acceso |
-| Seguridad | clasificación, secret scan, almacenamiento y transferencia |
-| Procedencia | localizador, fecha, hash, versión y transformaciones |
-| Calidad | cobertura, idioma, duplicados, ruido, sesgos y rechazo |
-| Evaluación | split por documento/fuente, leakage y criterios |
-| Publicación | revisión humana, manifest, license y rollback |
+1. **Admisión:** ¿está permitido copiar, transformar y usar para el objetivo declarado?
+2. **Minimización:** ¿puede excluirse información personal, secreta o irrelevante?
+3. **Curación:** ¿hay idioma, dominio, fecha, calidad y representación suficientes?
+4. **Separación:** ¿train, validation, test y material confidencial están aislados?
+5. **Publicación:** ¿artefactos, muestras, logs y manifest pueden hacerse públicos?
+6. **Retiro:** ¿es posible localizar y eliminar una fuente y sus derivados?
 
-## Regla especial para pagos
+## Lineage mínimo
 
-No se aceptan PAN, CVV/CVC, PIN/PIN block, track data, tokens vivos, API keys, secretos de webhook, datos KYC, cuentas reales ni transacciones de clientes. Los ejemplos deben ser conceptuales o sintéticos y no parecer credenciales utilizables. Si una fuente autorizada contiene datos sensibles, se rechaza antes de la foundry; el detector ligero no es una zona de descontaminación.
+Conserva locator, hash de fuente, hash de contenido, fecha de corte, versión del pipeline, configuración, licencia declarada y decisiones humanas. Un hash ayuda a responder “qué cambió”; no responde “quién autorizó”. Esa evidencia vive fuera del texto de entrenamiento y debe conservarse durante todo su ciclo de vida.
 
-## Procedencia y transformaciones
+## Privacidad
 
-Conserva originales inmutables fuera del repo, hash, licencia, fecha de obtención, configuración, versión del pipeline, manifest y aprobador. Un hash demuestra igualdad de bytes, no autenticidad ni legalidad.
-
-## Separación de datasets
-
-Divide train/validation/test por documento, entidad o fuente según el riesgo de leakage; nunca por chunks aleatorios del mismo documento. Mantén un holdout que no haya influido en prompts, reglas ni selección.
-
-## Corrección y retiro
-
-Un dataset publicado necesita identificador/version, lineage hacia chunks afectados, procedimiento de takedown, capacidad de regeneración y registro de consumidores. El borrado del archivo fuente no retira automáticamente embeddings, caches, checkpoints o exportaciones.
-
-## Roles
-
-- Data owner: autoriza propósito y riesgo.
-- Steward: mantiene procedencia, calidad y catálogo.
-- Security/privacy: revisa datos sensibles y controles.
-- Domain reviewer: valida significado y vigencia.
-- Operator: ejecuta pipeline y preserva evidencia.
-
-Nadie debe autoaprobar una excepción que haya solicitado.
+La detección incluida es una barrera ligera. Para producción incorpora clasificación, DLP, revisión humana, políticas de retención, control de acceso, cifrado, borrado verificable y evaluación de reidentificación. Evita publicar fragmentos de ejemplo obtenidos de fuentes privadas.

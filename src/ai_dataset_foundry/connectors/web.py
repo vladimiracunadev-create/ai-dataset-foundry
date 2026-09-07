@@ -10,12 +10,12 @@ def load_url(url: str) -> list[DocumentRecord]:
     try:
         import requests
     except ImportError as exc:
-        raise RuntimeError("Web support requires: pip install -e '.[web]'") from exc
+        raise RuntimeError("Web support requires: uv sync --extra web") from exc
 
     response = requests.get(
         url,
         timeout=30,
-        headers={"User-Agent": "AI-Dataset-Foundry/0.1 (+dataset ingestion; respectful single-page fetch)"},
+        headers={"User-Agent": "AI-Dataset-Foundry/0.2 (+dataset ingestion; single-page fetch)"},
     )
     response.raise_for_status()
     raw = response.content

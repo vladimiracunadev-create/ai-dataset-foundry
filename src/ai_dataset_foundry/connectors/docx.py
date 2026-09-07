@@ -10,7 +10,7 @@ def load_docx(path: Path) -> list[DocumentRecord]:
     try:
         from docx import Document
     except ImportError as exc:
-        raise RuntimeError("DOCX support requires: pip install -e '.[documents]'") from exc
+        raise RuntimeError("DOCX support requires: uv sync --extra documents") from exc
 
     source_hash = sha256_file(path)
     doc = Document(str(path))

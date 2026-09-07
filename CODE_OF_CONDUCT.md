@@ -12,7 +12,7 @@ Este proyecto busca una colaboración técnica respetuosa, inclusiva y basada en
 
 ## Conducta inaceptable
 
-Acoso, discriminación, amenazas, doxxing, contenido sexual no solicitado, sabotaje deliberado, uso de datos de pago reales o explotación de terceros bajo pretexto de investigación.
+Acoso, discriminación, amenazas, doxxing, contenido sexual no solicitado, sabotaje deliberado, publicación de datos reales sin autorización o explotación de terceros bajo pretexto de investigación.
 
 ## Aplicación
 

@@ -1,58 +1,29 @@
-# Contrato del dataset
+# Contrato de datos
 
-## Registro JSONL
-
-Cada línea es un `ChunkRecord` independiente:
+JSONL es la representación canónica: un objeto JSON autónomo por línea. Esto permite streaming, particionado y recuperación puntual sin cargar todo el corpus.
 
 ```json
 {
-  "id": "chunk_0123456789abcdefabcd",
-  "document_id": "doc_0123456789abcdefabcd",
-  "text": "Contenido normalizado y aceptado.",
-  "source": {
-    "kind": "md",
-    "locator": "examples/payments-corpus/cards.md",
-    "title": "cards.md",
-    "license": null
-  },
-  "metadata": {"chunk_index": 0},
-  "provenance": {
-    "source_sha256": "...",
-    "content_sha256": "..."
-  },
-  "quality": {
-    "score": 1.0,
-    "accepted": true,
-    "reasons": []
-  }
+  "id": "chunk_…",
+  "document_id": "doc_…",
+  "text": "Contenido normalizado",
+  "source": {"kind": "pdf", "locator": "manual.pdf", "title": "Manual", "license": null},
+  "metadata": {"page": 4, "chunk_index": 2},
+  "provenance": {"source_sha256": "…", "content_sha256": "…"},
+  "quality": {"score": 1.0, "accepted": true, "reasons": []}
 }
 ```
 
-| Campo | Garantía |
-| --- | --- |
-| `id` | estable para documento, índice y contenido iguales |
-| `document_id` | enlaza con unidad extraída, no necesariamente archivo completo |
-| `text` | UTF-8 normalizado y transformado |
-| `source` | procedencia descriptiva; `license` puede faltar |
-| `metadata` | extensible por conector y contiene `chunk_index` |
-| `source_sha256` | hash de bytes originales cuando el conector dispone de ellos |
-| `content_sha256` | hash del texto final del chunk |
-| `quality` | decisión heurística y razones/flags |
+## Semántica
 
-## Manifiesto
+`id` identifica el fragmento de manera estable para la misma fuente, índice y contenido. `document_id` permite reagrupar. `source` describe adquisición, no autoría. `metadata` conserva atributos específicos del conector. Los hashes detectan cambios; no prueban autenticidad ni derechos. `quality` registra la decisión automática aplicada durante ese build.
 
-`manifest.json` registra versión de esquema, timestamp UTC, inputs, documentos cargados, chunks exportados, duplicados, rechazos, errores, formatos, outputs y snapshot de settings. Si SQLite está activo incluye su ruta.
+## Artefactos
 
-El manifiesto prueba **qué ejecutó el pipeline**, no licencia, veracidad ni completitud de la fuente. Para reproducibilidad fuerte faltan versiones de dependencias, commit de la fuente, entorno y checksum del artefacto final; son evolución planificada.
+- `dataset.jsonl`: intercambio y streaming.
+- `dataset.txt`: inspección o tokenización simple; pierde estructura rica.
+- `dataset.parquet`: análisis columnar a escala con PyArrow.
+- `dataset.sqlite`: catálogo consultable y manifest local.
+- `manifest.json`: recibo del proceso; es obligatorio para auditoría.
 
-## SQLite
-
-`dataset.sqlite` contiene `dataset_meta` y `chunks`, con índices por documento, tipo de fuente y hash de contenido. Es un catálogo local, no un vector store ni warehouse.
-
-## Mapping downstream
-
-Fine-tuning requiere transformar estos registros genéricos al contrato del proveedor (`messages`, `prompt/completion` u otro). RAG requiere embeddings, estrategia de retrieval, filtros y evaluación. No mezcles esa proyección con el corpus canónico: conserva un nivel neutral trazable.
-
-## Datos de pagos prohibidos
-
-El corpus de referencia solo usa conceptos y referencias sintéticas. No almacenes PAN, SAD/CVV, PIN, track data, credenciales bancarias, tokens vivos, claves de webhook, documentos KYC ni transacciones de clientes. Hashing no anonimiza datos de baja entropía.
+Los consumidores deben validar `schema_version`, tratar metadata como extensible y no inferir que un registro aceptado es verdadero o apropiado para cualquier objetivo.

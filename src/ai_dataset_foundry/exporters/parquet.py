@@ -10,7 +10,7 @@ def export_parquet(records: list[ChunkRecord], path: Path) -> None:
         import pyarrow as pa
         import pyarrow.parquet as pq
     except ImportError as exc:
-        raise RuntimeError("Parquet support requires: pip install -e '.[parquet]'") from exc
+        raise RuntimeError("Parquet support requires: uv sync --extra parquet") from exc
 
     table = pa.Table.from_pylist([record.to_dict() for record in records])
     pq.write_table(table, path, compression="zstd")

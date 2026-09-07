@@ -1,17 +1,19 @@
 # Configuración
 
-## Contrato completo
+La CLI recibe un YAML validado por Pydantic. Una configuración es parte de la evidencia del dataset y debe versionarse junto con el código.
 
 ```yaml
 inputs:
-  - examples/payments-corpus
-out_dir: work/payments-lab
-formats: [jsonl, txt]
+  - corpus/manuales
+  - https://example.org/guia
+  - https://github.com/organizacion/repositorio.git
+out_dir: work/dataset-v1
+formats: [jsonl, txt, parquet]
 recursive: true
 write_sqlite: true
 chunk:
-  strategy: markdown
-  size: 1400
+  strategy: paragraph
+  size: 1200
   overlap: 120
 quality:
   min_chars: 80
@@ -23,50 +25,19 @@ dedup:
   simhash_distance: 3
 ```
 
-## Campos
+## Entradas y salidas
 
-| Ruta | Tipo / default | Propósito |
-| --- | --- | --- |
-| `inputs` | lista vacía | archivos, directorios, URL o repos Git |
-| `out_dir` | `work/dataset` | directorio de artefactos derivados |
-| `formats` | `[jsonl]` | `jsonl`, `txt`, `parquet` |
-| `recursive` | `true` | recorre directorios |
-| `write_sqlite` | `true` | crea catálogo `dataset.sqlite` |
-| `chunk.strategy` | `paragraph` | `paragraph`, `sentence`, `markdown`, `fixed` |
-| `chunk.size` | `1200` | objetivo en caracteres, entre 100 y 100.000 |
-| `chunk.overlap` | `120` | solapamiento del modo fixed, 0 a 20.000 |
-| `quality.min_chars` | `80` | rechaza piezas demasiado breves |
-| `quality.max_control_ratio` | `0.02` | tolerancia de caracteres de control |
-| `quality.reject_secrets` | `false` | rechaza flags de secreto; el ejemplo seguro lo activa |
-| `dedup.enabled` | `true` | deduplicación exacta |
-| `dedup.near_duplicate` | `true` | activa SimHash |
-| `dedup.simhash_distance` | `3` | distancia Hamming, 0 a 32 |
+`inputs` acepta archivos, directorios, URL HTTP(S) y repositorios Git. `recursive` gobierna el descenso por directorios. `formats` admite `jsonl`, `txt` y `parquet`; SQLite se controla separadamente. `out_dir` debe ser desechable: el pipeline puede regenerarlo, pero nunca modifica la fuente.
 
-## Estrategias de chunking
+## Segmentación
 
-- `paragraph`: empaqueta párrafos hasta el objetivo; adecuado para prosa.
-- `sentence`: conserva límites de oración detectados heurísticamente.
-- `markdown`: intenta preservar secciones bajo encabezados; recomendado para el corpus de pagos.
-- `fixed`: ventanas por caracteres con overlap; útil para pruebas controladas, menos semántico.
+- `paragraph`: agrupa párrafos hasta el tamaño objetivo; buen valor general.
+- `sentence`: respeta fronteras aproximadas de oración.
+- `markdown`: favorece encabezados y bloques documentales.
+- `fixed`: ventanas deterministas; útil como baseline, menos semántico.
 
-`size` no equivale a tokens. Mide el tokenizer del modelo downstream antes de fijar límites productivos.
+`size` y `overlap` se expresan en caracteres, no tokens. El tokenizer del modelo debe medir el resultado final. Un solapamiento grande mejora continuidad pero incrementa duplicación, almacenamiento y riesgo de leakage.
 
-## Prioridad CLI frente a YAML
+## Calidad y deduplicación
 
-Cuando se pasa `--config`, el archivo define inputs, output y formatos. No mezcles mentalmente flags de la otra ruta. Valida antes:
-
-```bash
-foundry validate examples/payments.yaml
-foundry build --config examples/payments.yaml
-```
-
-## Fallos parciales
-
-Un input fallido aparece en `manifest.json > ingestion_errors`; los inputs válidos continúan. En producción define un umbral: «dataset generado» no debe significar «dataset completo» si faltó una fuente obligatoria.
-
-## Configuración segura
-
-- No pongas tokens en YAML ni URL; usa un secret manager en conectores futuros.
-- Mantén `work/`, `datasets/` y `exports/` fuera de Git.
-- Usa `reject_secrets: true` como defensa auxiliar, no como permiso para ingerir material sensible.
-- Guarda la configuración junto al manifiesto y controla cambios como código.
+`min_chars` rechaza fragmentos triviales. `max_control_ratio` limita caracteres de control. `reject_secrets` detecta patrones evidentes, pero no sustituye DLP ni revisión. SimHash aproxima similitud léxica; una distancia menor es más conservadora. Para corpus críticos conserva el registro de rechazados y revisa falsos positivos.

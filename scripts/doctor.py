@@ -24,6 +24,9 @@ def main() -> int:
         "Web HTML (bs4)": "bs4",
         "Web extraction (trafilatura)": "trafilatura",
         "Parquet (pyarrow)": "pyarrow",
+        "Local UI (fastapi)": "fastapi",
+        "Local server (uvicorn)": "uvicorn",
+        "Windows host (webview)": "webview",
     }
     for name, module in optional.items():
         available = importlib.util.find_spec(module) is not None
