@@ -1,0 +1,20 @@
+inputs:
+  - examples/sample.txt
+out_dir: work/example-from-config
+formats:
+  - jsonl
+  - txt
+recursive: true
+write_sqlite: true
+chunk:
+  strategy: paragraph
+  size: 900
+  overlap: 80
+quality:
+  min_chars: 40
+  max_control_ratio: 0.02
+  reject_secrets: true
+dedup:
+  enabled: true
+  near_duplicate: true
+  simhash_distance: 3

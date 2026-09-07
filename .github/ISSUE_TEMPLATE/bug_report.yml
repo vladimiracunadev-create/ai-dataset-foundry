@@ -1,0 +1,31 @@
+name: Bug report
+description: Reportar un defecto reproducible sin datos sensibles
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: No incluyas PAN, CVV, secretos, PII ni datos de clientes. Usa Security para vulnerabilidades.
+  - type: input
+    id: version
+    attributes:
+      label: Versión o commit
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Comportamiento observado y esperado
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproducción mínima con datos sintéticos
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Entorno
+      description: SO, versión de Python y extras instalados.

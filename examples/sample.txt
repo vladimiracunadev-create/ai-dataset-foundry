@@ -1,0 +1,5 @@
+Las redes neuronales artificiales son modelos computacionales inspirados de manera general en redes de unidades conectadas.
+
+Antes del entrenamiento es necesario construir un corpus confiable. El corpus debe preservar procedencia, calidad, licencias y transformaciones aplicadas.
+
+AI Dataset Foundry convierte fuentes heterogéneas en registros normalizados que pueden exportarse a formatos como JSONL, TXT o Parquet.

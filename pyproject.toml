@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ai-dataset-foundry"
+version = "0.1.0"
+description = "Local-first pipeline for auditable AI corpora, with a payment-systems knowledge lab."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Vladimir Acuña"}]
+keywords = ["datasets", "rag", "fine-tuning", "payments", "data-governance", "provenance"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "typer>=0.12,<1",
+  "rich>=13.7,<15",
+  "pydantic>=2.8,<3",
+  "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+documents = [
+  "pypdf>=5,<7",
+  "python-docx>=1.1,<2",
+]
+web = [
+  "requests>=2.32,<3",
+  "beautifulsoup4>=4.12,<5",
+  "trafilatura>=2,<3",
+]
+parquet = [
+  "pyarrow>=17,<22",
+]
+all = [
+  "pypdf>=5,<7",
+  "python-docx>=1.1,<2",
+  "requests>=2.32,<3",
+  "beautifulsoup4>=4.12,<5",
+  "trafilatura>=2,<3",
+  "pyarrow>=17,<22",
+]
+dev = [
+  "pytest>=8.3,<9",
+  "ruff>=0.8,<1",
+]
+
+[project.scripts]
+foundry = "ai_dataset_foundry.cli:app"
+
+[project.urls]
+Homepage = "https://vladimiracunadev-create.github.io/ai-dataset-foundry/"
+Repository = "https://github.com/vladimiracunadev-create/ai-dataset-foundry"
+Documentation = "https://github.com/vladimiracunadev-create/ai-dataset-foundry#readme"
+Issues = "https://github.com/vladimiracunadev-create/ai-dataset-foundry/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ai_dataset_foundry"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

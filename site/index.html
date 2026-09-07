@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Pipeline local-first para corpus auditables y laboratorio pedagógico de sistemas de pago.">
+  <meta name="theme-color" content="#07111f">
+  <title>AI Dataset Foundry · Payment Systems Lab</title>
+  <style>
+    :root{--bg:#07111f;--panel:#0d1b2d;--line:#233853;--text:#eaf2ff;--muted:#94a9c5;--cyan:#42d9e8;--mint:#69f0ae;--amber:#ffc857;--violet:#a78bfa;--max:1160px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% -10%,#173b5e 0,transparent 38%),radial-gradient(circle at 0 32%,#132f37 0,transparent 30%),var(--bg);color:var(--text);font:16px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}a{color:inherit;text-decoration:none}a:hover{color:var(--cyan)}.wrap{width:min(calc(100% - 40px),var(--max));margin:auto}.nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}.brand{font-weight:800;letter-spacing:-.02em}.brand span{color:var(--cyan)}.navlinks{display:flex;gap:24px;color:var(--muted);font-size:.9rem}.hero{padding:88px 0 56px;display:grid;grid-template-columns:1.35fr .65fr;gap:55px;align-items:center}.eyebrow{color:var(--mint);font-size:.78rem;font-weight:800;letter-spacing:.16em;text-transform:uppercase}.hero h1{font-size:clamp(3rem,7vw,6.7rem);line-height:.91;letter-spacing:-.065em;margin:18px 0 28px;max-width:900px}.gradient{background:linear-gradient(100deg,var(--cyan),var(--mint),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent}.lead{font-size:clamp(1.05rem,1.8vw,1.28rem);color:#bfd0e7;max-width:750px}.actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px}.button{padding:12px 18px;border:1px solid var(--line);border-radius:10px;font-weight:700;background:#0c1a2b}.button.primary{background:var(--cyan);color:#041017;border-color:transparent}.terminal{border:1px solid var(--line);background:#07101bd9;border-radius:18px;box-shadow:0 30px 80px #0008;overflow:hidden;transform:rotate(1.5deg)}.dots{padding:13px 17px;border-bottom:1px solid var(--line);color:#56708f;letter-spacing:5px}.terminal pre{margin:0;padding:23px;color:#b7c9de;white-space:pre-wrap;font:13px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace}.ok{color:var(--mint)}.cyan{color:var(--cyan)}section{padding:70px 0}.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:28px}.section-head h2{font-size:clamp(2rem,4vw,3.5rem);line-height:1;letter-spacing:-.04em;margin:0}.section-head p{max-width:540px;color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:linear-gradient(160deg,#10233aee,#0a1726ee);border:1px solid var(--line);border-radius:16px;padding:23px;min-height:190px}.card .num{font:700 .75rem ui-monospace;color:var(--cyan)}.card h3{font-size:1.18rem;margin:18px 0 9px}.card p{color:var(--muted);margin:0}.rail{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:center}.node{background:#0d1b2d;border:1px solid var(--line);padding:20px 10px;border-radius:12px;text-align:center;font-weight:700;font-size:.84rem;position:relative}.node:not(:last-child):after{content:"→";position:absolute;right:-12px;color:var(--cyan);z-index:2}.truth{border:1px solid #2a6c5d;background:linear-gradient(120deg,#0d2d2b,#0d1b2d);border-radius:20px;padding:35px;display:grid;grid-template-columns:1fr 1fr;gap:30px}.truth h2{margin:0;font-size:clamp(2rem,4vw,3.3rem);line-height:1}.checks{display:grid;gap:12px}.check{display:flex;gap:12px;color:#c8d6e7}.check b{color:var(--mint)}footer{padding:45px 0 60px;color:var(--muted);border-top:1px solid var(--line);margin-top:40px}.footerline{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted);font-size:.76rem;margin:3px}
+    @media(max-width:850px){.hero{grid-template-columns:1fr;padding-top:55px}.terminal{transform:none}.grid{grid-template-columns:1fr 1fr}.rail{grid-template-columns:1fr 1fr}.node:not(:last-child):after{display:none}.truth{grid-template-columns:1fr}.navlinks{display:none}}
+    @media(max-width:560px){.grid,.rail{grid-template-columns:1fr}.section-head{display:block}.section-head p{margin-top:15px}.hero h1{font-size:3.3rem}}
+  </style>
+</head>
+<body>
+  <header class="wrap nav">
+    <a class="brand" href="#top">AI DATASET <span>FOUNDRY</span></a>
+    <nav class="navlinks" aria-label="Principal"><a href="#pipeline">Pipeline</a><a href="#payments">Pagos</a><a href="#truth">Estado real</a><a href="https://github.com/vladimiracunadev-create/ai-dataset-foundry">GitHub ↗</a></nav>
+  </header>
+
+  <main id="top">
+    <section class="wrap hero">
+      <div>
+        <div class="eyebrow">Local-first · auditable · payment systems</div>
+        <h1>Datos con linaje.<br><span class="gradient">Pagos sin ficción.</span></h1>
+        <p class="lead">Una foundry reproducible para convertir fuentes heterogéneas en corpus trazables y un laboratorio profundo para entender cómo operan los pagos: desde la intención hasta el settlement, el ledger y la conciliación.</p>
+        <div class="actions"><a class="button primary" href="https://github.com/vladimiracunadev-create/ai-dataset-foundry#-inicio-r%C3%A1pido">Ejecutar el laboratorio</a><a class="button" href="https://github.com/vladimiracunadev-create/ai-dataset-foundry/blob/main/docs/PAYMENT_METHODS.md">Explorar el atlas</a></div>
+      </div>
+      <div class="terminal" aria-label="Ejemplo de terminal">
+        <div class="dots">● ● ●</div>
+        <pre><span class="cyan">$</span> foundry build --config examples/payments.yaml
+
+<span class="ok">✓</span> sources      3 synthetic documents
+<span class="ok">✓</span> provenance   SHA-256 + stable IDs
+<span class="ok">✓</span> quality      privacy gate enabled
+<span class="ok">✓</span> outputs      JSONL · TXT · SQLite
+
+Dataset ready → work/payments-lab</pre>
+      </div>
+    </section>
+
+    <section id="pipeline" class="wrap">
+      <div class="section-head"><h2>Una cadena que<br>deja evidencia.</h2><p>Los originales permanecen intactos. Cada chunk conserva procedencia, hashes, metadatos, decisión de calidad y un manifiesto de ejecución.</p></div>
+      <div class="rail"><div class="node">Fuentes</div><div class="node">Extraer</div><div class="node">Normalizar</div><div class="node">Deduplicar</div><div class="node">Segmentar</div><div class="node">Validar</div><div class="node">Exportar</div></div>
+    </section>
+
+    <section id="payments" class="wrap">
+      <div class="section-head"><h2>Nueve familias.<br>Un sistema completo.</h2><p>No es una lista de logos. Cada familia se estudia por fuente de fondos, iniciación, rail, finality, reversibilidad, riesgo y operación.</p></div>
+      <div class="grid">
+        <article class="card"><span class="num">01</span><h3>Efectivo y valor cerrado</h3><p>Caja, contra entrega, vouchers, custodia, arqueo y pasivos de stored value.</p></article>
+        <article class="card"><span class="num">02</span><h3>Papel</h3><p>Cheques, vale vista, giros, presentación, truncamiento, clearing y devolución.</p></article>
+        <article class="card"><span class="num">03</span><h3>Tarjetas</h3><p>Crédito, débito, prepago, EMV, 3DS, tokenización, PCI y disputas.</p></article>
+        <article class="card"><span class="num">04</span><h3>Cuenta a cuenta</h3><p>TEF, ACH, direct debit, instant payments, wire, RTGS e ISO 20022.</p></article>
+        <article class="card"><span class="num">05</span><h3>Wallets y dispositivos</h3><p>Pass-through, saldo, QR, NFC, wearables, token de red y ledger interno.</p></article>
+        <article class="card"><span class="num">06</span><h3>Crédito embebido</h3><p>Cuotas, BNPL, POS financing, underwriting, refunds, mora y cobranza.</p></article>
+        <article class="card"><span class="num">07</span><h3>Cobro remoto</h3><p>Links, invoices, USSD, carrier billing, agentes, referencias y phishing.</p></article>
+        <article class="card"><span class="num">08</span><h3>Transfronterizo</h3><p>Corresponsalía, SWIFT, remesas, FX, nostro/vostro y payout local.</p></article>
+        <article class="card"><span class="num">09</span><h3>Activos digitales</h3><p>Cripto, stablecoins, CBDC, depósitos tokenizados, custodia y finality.</p></article>
+      </div>
+    </section>
+
+    <section id="truth" class="wrap">
+      <div class="truth">
+        <h2>La demo declara<br><span class="gradient">exactamente lo que es.</span></h2>
+        <div class="checks"><div class="check"><b>✓</b><span>Motor local y corpus sintético ejecutables.</span></div><div class="check"><b>✓</b><span>Arquitectura, seguridad y operación explicadas en profundidad.</span></div><div class="check"><b>✓</b><span>Cero PAN, CVV, secretos o transacciones reales.</span></div><div class="check"><b>✓</b><span>No se presenta como gateway, PSP ni sistema certificado.</span></div><div class="check"><b>✓</b><span>Estado, pruebas, workflows y limitaciones verificables.</span></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="wrap footerline"><div><strong>AI Dataset Foundry</strong><br>Diseñado por Vladimir Acuña · MIT</div><div><span class="pill">Python 3.11+</span><span class="pill">JSONL</span><span class="pill">SQLite</span><span class="pill">Payment systems</span><br><small>Estado documental verificado · 7 septiembre 2026</small></div></div></footer>
+</body>
+</html>

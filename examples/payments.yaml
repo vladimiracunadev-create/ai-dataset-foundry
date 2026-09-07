@@ -1,0 +1,20 @@
+inputs:
+  - examples/payments-corpus
+out_dir: work/payments-lab
+formats:
+  - jsonl
+  - txt
+recursive: true
+write_sqlite: true
+chunk:
+  strategy: markdown
+  size: 1400
+  overlap: 120
+quality:
+  min_chars: 80
+  max_control_ratio: 0.02
+  reject_secrets: true
+dedup:
+  enabled: true
+  near_duplicate: true
+  simhash_distance: 3
