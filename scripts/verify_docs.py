@@ -49,6 +49,23 @@ def main() -> int:
             if not FULL_SHA.fullmatch(ref):
                 failures.append(f"unpinned action: {workflow.name} -> {ref}")
 
+    system_docs = ROOT / "docs" / "system-documentation"
+    names = [
+        "system-overview", "installation-and-execution", "architecture", "code-map",
+        "technical-reference", "deep-code-explanation", "database", "data-flow",
+        "apis-and-integrations", "configuration", "security", "testing-and-quality",
+        "deployment-and-operations", "troubleshooting", "risks-and-technical-debt",
+        "glossary", "executive-summary", "new-developer-guide", "traceability-matrix",
+    ]
+    required_sources = [system_docs / "README.md"] + [
+        system_docs / f"{number:02d}-{name}.md" for number, name in enumerate(names, 1)
+    ]
+    for source in required_sources:
+        if not source.is_file() or source.stat().st_size < 300:
+            failures.append(f"missing or empty system document: {source.relative_to(ROOT)}")
+        pdf = system_docs / "pdf" / f"{source.stem}.pdf"
+        if not pdf.is_file() or pdf.stat().st_size < 1000:
+            failures.append(f"missing or empty PDF: {pdf.relative_to(ROOT)}")
     if failures:
         print("Repository coherence verification failed:")
         for failure in failures:

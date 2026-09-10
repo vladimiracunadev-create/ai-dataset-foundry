@@ -1,6 +1,6 @@
 # Estado verificable
 
-Fecha de corte: **2026-09-07** · versión canónica: **0.2.0**
+Fecha de corte: **2026-09-10** · versión canónica: **0.2.0**
 
 ## Matriz de madurez
 

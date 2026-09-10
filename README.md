@@ -150,6 +150,19 @@ La foundry genera un corpus neutral y trazable. No inventa respuestas supervisad
 | operar y resolver fallos | [`docs/RUNBOOK.md`](docs/RUNBOOK.md) |
 | evaluar el proyecto en 10 minutos | [`RECRUITER.md`](RECRUITER.md) |
 
+## Documentación del sistema
+
+La documentación técnica, funcional, arquitectónica y operativa integral se encuentra en:
+
+- [Índice general de documentación](docs/system-documentation/README.md)
+- [Descripción general](docs/system-documentation/01-system-overview.md)
+- [Arquitectura](docs/system-documentation/03-architecture.md)
+- [Referencia técnica](docs/system-documentation/05-technical-reference.md)
+- [Base de datos](docs/system-documentation/07-database.md)
+- [Resumen ejecutivo](docs/system-documentation/17-executive-summary.md)
+- [Guía para nuevos desarrolladores](docs/system-documentation/18-new-developer-guide.md)
+- [Documentos en PDF](docs/system-documentation/pdf/)
+
 ## 🛡️ Seguridad y límites
 
 No ingieras fuentes sin autorización, credenciales, datos personales innecesarios ni documentos internos en un repositorio público. La extracción de contenido hostil debe aislarse antes de producción. Consulta [`SECURITY.md`](SECURITY.md) y [`docs/GOVERNANCE.md`](docs/GOVERNANCE.md).
@@ -192,4 +205,4 @@ Código y documentación bajo [MIT](LICENSE). Las fuentes que proceses mantienen
 
 ---
 
-Hecho por [Vladimir Acuña](https://github.com/vladimiracunadev-create) · documentación y estado verificados el **7 de septiembre de 2026**.
+Hecho por [Vladimir Acuña](https://github.com/vladimiracunadev-create) · documentación y estado verificados el **10 de septiembre de 2026**.

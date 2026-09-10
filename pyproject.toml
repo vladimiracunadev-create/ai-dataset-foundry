@@ -23,12 +23,15 @@ classifiers = [
 ]
 dependencies = [
   "typer>=0.12,<1",
-  "rich>=13.7,<15",
+  "rich>=13.7,<16",
   "pydantic>=2.8,<3",
   "PyYAML>=6.0,<7",
 ]
 
 [project.optional-dependencies]
+docs = [
+  "reportlab>=4.4,<5",
+]
 documents = [
   "pypdf>=5,<7",
   "python-docx>=1.1,<2",
@@ -39,7 +42,7 @@ web = [
   "trafilatura>=2,<3",
 ]
 parquet = [
-  "pyarrow>=23.0.1,<24",
+  "pyarrow>=23.0.1,<26",
 ]
 ui = [
   "fastapi>=0.116,<1",
@@ -53,12 +56,13 @@ desktop = [
   "pywebview>=6,<7",
 ]
 all = [
+  "reportlab>=4.4,<5",
   "pypdf>=5,<7",
   "python-docx>=1.1,<2",
   "requests>=2.32,<3",
   "beautifulsoup4>=4.12,<5",
   "trafilatura>=2,<3",
-  "pyarrow>=23.0.1,<24",
+  "pyarrow>=23.0.1,<26",
   "fastapi>=0.116,<1",
   "uvicorn>=0.35,<1",
   "python-multipart>=0.0.20,<1",

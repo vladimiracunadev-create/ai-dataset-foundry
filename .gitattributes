@@ -7,3 +7,4 @@
 *.html text eol=lf
 *.java text eol=lf
 *.kts text eol=lf
+*.pdf binary
