@@ -42,7 +42,7 @@ web = [
   "trafilatura>=2,<3",
 ]
 parquet = [
-  "pyarrow>=23.0.1,<26",
+  "pyarrow>=23.0.1,<27",
 ]
 ui = [
   "fastapi>=0.116,<1",
@@ -62,7 +62,7 @@ all = [
   "requests>=2.32,<3",
   "beautifulsoup4>=4.12,<5",
   "trafilatura>=2,<3",
-  "pyarrow>=23.0.1,<26",
+  "pyarrow>=23.0.1,<27",
   "fastapi>=0.116,<1",
   "uvicorn>=0.35,<1",
   "python-multipart>=0.0.20,<1",
